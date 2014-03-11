@@ -1,5 +1,5 @@
 # mruby-memcached   [![Build Status](https://travis-ci.org/matsumoto-r/mruby-memcached.png?branch=master)](https://travis-ci.org/matsumoto-r/mruby-memcached)
-libmemcached bindings by mruby.
+[libmemcached](http://libmemcached.org/libMemcached.html) bindings by mruby.
 ## install by mrbgems 
 - add conf.gem line to `build_config.rb` 
 
