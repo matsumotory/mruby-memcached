@@ -148,12 +148,6 @@ static mrb_value mrb_memcached_get(mrb_state *mrb, mrb_value self)
   return mrb_str_new(mrb, val, len);
 }
 
-static mrb_value mrb_memcached_count_servers(mrb_state *mrb, mrb_value self)
-{
-  mrb_memcached_data *data = DATA_PTR(self);
-  return mrb_fixnum_value(memcached_server_list_count(data->msv));
-}
-
 void mrb_mruby_memcached_gem_init(mrb_state *mrb)
 {
     struct RClass *memcached;
@@ -163,7 +157,6 @@ void mrb_mruby_memcached_gem_init(mrb_state *mrb)
     mrb_define_method(mrb, memcached, "close", mrb_memcached_close, MRB_ARGS_NONE());
     mrb_define_method(mrb, memcached, "set", mrb_memcached_set, MRB_ARGS_ANY());
     mrb_define_method(mrb, memcached, "get", mrb_memcached_get, MRB_ARGS_REQ(1));
-    mrb_define_method(mrb, memcached, "count_servers", mrb_memcached_count_servers, MRB_ARGS_NONE());
     DONE;
 }
 
