@@ -15,15 +15,12 @@
 #define DONE mrb_gc_arena_restore(mrb, 0);
 
 typedef struct {
-  memcached_server_st *msv;
   memcached_st *mst;
-  memcached_return mrt;
 } mrb_memcached_data;
 
 static void mrb_memcached_data_free(mrb_state *mrb, void *p)
 {   
   mrb_memcached_data *data = (mrb_memcached_data *)p;
-  memcached_server_list_free(data->msv);
   memcached_free(data->mst);
 }
 
@@ -60,11 +57,10 @@ static mrb_value mrb_memcached_init(mrb_state *mrb, mrb_value self)
     mrb_raisef(mrb, E_RUNTIME_ERROR, "libmemcached error: %S"
       , mrb_str_new_cstr(mrb, memcached_strerror(mst, mrt)));
   }
+  memcached_server_list_free(msv);
 
   data = (mrb_memcached_data *)mrb_malloc(mrb, sizeof(mrb_memcached_data));
-  data->msv = msv;
   data->mst = mst;
-  data->mrt = mrt;
   DATA_PTR(self) = data;
 
   return self;
@@ -75,22 +71,22 @@ static mrb_value mrb_memcached_server_add(mrb_state *mrb, mrb_value self)
   mrb_memcached_data *data = DATA_PTR(self);
   char *host;
   mrb_int port;
+  memcached_return mrt;
 
   mrb_get_args(mrb, "zi", &host, &port);
-  data->mrt = memcached_server_add(data->mst, host, port);
-  if (data->mrt != MEMCACHED_SUCCESS) {
+  mrt = memcached_server_add(data->mst, host, port);
+  if (mrt != MEMCACHED_SUCCESS) {
     // can't add server to memcached server list
     mrb_raisef(mrb, E_RUNTIME_ERROR, "libmemcached error: %S"
-      , mrb_str_new_cstr(mrb, memcached_strerror(data->mst, data->mrt)));
+      , mrb_str_new_cstr(mrb, memcached_strerror(data->mst, mrt)));
   }
 
-  return mrb_fixnum_value(data->mrt);
+  return mrb_fixnum_value(mrt);
 }
 
 static mrb_value mrb_memcached_close(mrb_state *mrb, mrb_value self)
 {
   mrb_memcached_data *data = DATA_PTR(self);
-  memcached_server_list_free(data->msv);
   memcached_free(data->mst);
   return self;
 }
@@ -100,6 +96,7 @@ static mrb_value mrb_memcached_set(mrb_state *mrb, mrb_value self)
   mrb_value key, val;
   mrb_int expr = 0;
   mrb_memcached_data *data = DATA_PTR(self);
+  memcached_return mrt;
 
   mrb_get_args(mrb, "oo|i", &key, &val, &expr);
   switch (mrb_type(key)) {
@@ -113,12 +110,12 @@ static mrb_value mrb_memcached_set(mrb_state *mrb, mrb_value self)
   }
   val = mrb_obj_as_string(mrb, val);
 
-  data->mrt = memcached_set(data->mst, RSTRING_PTR(key), RSTRING_LEN(key), RSTRING_PTR(val), RSTRING_LEN(val), (time_t)expr, (uint32_t)0);
-  if (data->mrt != MEMCACHED_SUCCESS && data->mrt != MEMCACHED_BUFFERED) {
+  mrt = memcached_set(data->mst, RSTRING_PTR(key), RSTRING_LEN(key), RSTRING_PTR(val), RSTRING_LEN(val), (time_t)expr, (uint32_t)0);
+  if (mrt != MEMCACHED_SUCCESS && mrt != MEMCACHED_BUFFERED) {
     // set failed
     return mrb_nil_value();
   }
-  return mrb_fixnum_value(data->mrt);
+  return mrb_fixnum_value(mrt);
 }
 
 static mrb_value mrb_memcached_get(mrb_state *mrb, mrb_value self)
@@ -127,6 +124,7 @@ static mrb_value mrb_memcached_get(mrb_state *mrb, mrb_value self)
   char *val;
   size_t len;
   uint32_t flags;
+  memcached_return mrt;
   mrb_memcached_data *data = DATA_PTR(self);
 
   mrb_get_args(mrb, "o", &key);
@@ -139,8 +137,8 @@ static mrb_value mrb_memcached_get(mrb_state *mrb, mrb_value self)
     default:
       mrb_raise(mrb, E_RUNTIME_ERROR, "memcached key type is string or symbol");
   }
-  val = memcached_get(data->mst, RSTRING_PTR(key), RSTRING_LEN(key), &len, &flags, &(data->mrt));
-  if (data->mrt != MEMCACHED_SUCCESS && data->mrt != MEMCACHED_BUFFERED) {
+  val = memcached_get(data->mst, RSTRING_PTR(key), RSTRING_LEN(key), &len, &flags, &(mrt));
+  if (mrt != MEMCACHED_SUCCESS && mrt != MEMCACHED_BUFFERED) {
     free(val);
     // value not found
     return mrb_nil_value();
@@ -153,13 +151,14 @@ static mrb_value mrb_memcached_behavior_set(mrb_state *mrb, mrb_value self)
   mrb_memcached_data *data = DATA_PTR(self);
   uint64_t fdata = 1;
   memcached_behavior_t flag;
+  memcached_return mrt;
 
   mrb_get_args(mrb, "i|i", &flag, &fdata);
-  data->mrt = memcached_behavior_set(data->mst, flag, fdata);
-  if (data->mrt != MEMCACHED_SUCCESS) {
+  mrt = memcached_behavior_set(data->mst, flag, fdata);
+  if (mrt != MEMCACHED_SUCCESS) {
     return mrb_nil_value();
   }
-  return mrb_fixnum_value(data->mrt);
+  return mrb_fixnum_value(mrt);
 }
 
 void mrb_mruby_memcached_gem_init(mrb_state *mrb)
