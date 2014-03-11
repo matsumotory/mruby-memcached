@@ -33,23 +33,28 @@ end
 #### Replicas
 ```ruby
 m = Memcached.new "127.0.0.1", 11211
+
 m.server_add "127.0.0.1", 11212
+m.server_add "127.0.0.1", 11213
 
 m.behavior_set Memcached::MEMCACHED_BEHAVIOR_BINARY_PROTOCOL
-m.behavior_set Memcached::MEMCACHED_BEHAVIOR_NUMBER_OF_REPLICAS
+m.behavior_set Memcached::MEMCACHED_BEHAVIOR_NUMBER_OF_REPLICAS, 2
 
-m.set :hoge, 5
-p m.get :hoge # => 5
+m.set :hoge, "foo"
+p m.get :hoge # => foo
 
 m.close
 ```
 memcat 
 ```
 $ memcat --servers=127.0.0.1:11211 hoge
-5
+foo
 
 $ memcat --servers=127.0.0.1:11212 hoge
-5
+foo
+
+$ memcat --servers=127.0.0.1:11213 hoge
+foo
 ```
 
 
