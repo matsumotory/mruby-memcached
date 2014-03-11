@@ -70,22 +70,16 @@ static mrb_value mrb_memcached_init(mrb_state *mrb, mrb_value self)
   return self;
 }
 
-static mrb_value mrb_memcached_server_list_append(mrb_state *mrb, mrb_value self)
+static mrb_value mrb_memcached_add_server(mrb_state *mrb, mrb_value self)
 {
   mrb_memcached_data *data = DATA_PTR(self);
   char *host;
   mrb_int port;
 
   mrb_get_args(mrb, "zi", &host, &port);
-  data->msv = memcached_server_list_append(data->msv, host, port, &(data->mrt));
+  data->mrt = memcached_server_add(data->mst, host, port);
   if (data->mrt != MEMCACHED_SUCCESS) {
     // can't add server to memcached server list
-    mrb_raisef(mrb, E_RUNTIME_ERROR, "libmemcached error: %S"
-      , mrb_str_new_cstr(mrb, memcached_strerror(data->mst, data->mrt)));
-  }
-  data->mrt = memcached_server_push(data->mst, data->msv);
-  if (data->mrt != MEMCACHED_SUCCESS) {
-    // can't push server list to memcached context
     mrb_raisef(mrb, E_RUNTIME_ERROR, "libmemcached error: %S"
       , mrb_str_new_cstr(mrb, memcached_strerror(data->mst, data->mrt)));
   }
@@ -165,7 +159,7 @@ void mrb_mruby_memcached_gem_init(mrb_state *mrb)
     struct RClass *memcached;
     memcached = mrb_define_class(mrb, "Memcached", mrb->object_class);
     mrb_define_method(mrb, memcached, "initialize", mrb_memcached_init, MRB_ARGS_REQ(1));
-    mrb_define_method(mrb, memcached, "add_server", mrb_memcached_server_list_append, MRB_ARGS_REQ(2));
+    mrb_define_method(mrb, memcached, "add_server", mrb_memcached_add_server, MRB_ARGS_REQ(2));
     mrb_define_method(mrb, memcached, "close", mrb_memcached_close, MRB_ARGS_NONE());
     mrb_define_method(mrb, memcached, "set", mrb_memcached_set, MRB_ARGS_ANY());
     mrb_define_method(mrb, memcached, "get", mrb_memcached_get, MRB_ARGS_REQ(1));
