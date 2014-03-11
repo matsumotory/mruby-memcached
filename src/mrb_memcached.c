@@ -148,15 +148,70 @@ static mrb_value mrb_memcached_get(mrb_state *mrb, mrb_value self)
   return mrb_str_new(mrb, val, len);
 }
 
+static mrb_value mrb_memcached_set_behavior(mrb_state *mrb, mrb_value self)
+{
+  mrb_memcached_data *data = DATA_PTR(self);
+  uint64_t fdata = 1;
+  memcached_behavior_t flag;
+
+  mrb_get_args(mrb, "i|i", &flag, &fdata);
+  data->mrt = memcached_behavior_set(data->mst, flag, fdata);
+  if (data->mrt != MEMCACHED_SUCCESS) {
+    return mrb_nil_value();
+  }
+  return mrb_fixnum_value(data->mrt);
+}
+
 void mrb_mruby_memcached_gem_init(mrb_state *mrb)
 {
     struct RClass *memcached;
     memcached = mrb_define_class(mrb, "Memcached", mrb->object_class);
+
     mrb_define_method(mrb, memcached, "initialize", mrb_memcached_init, MRB_ARGS_REQ(1));
     mrb_define_method(mrb, memcached, "add_server", mrb_memcached_add_server, MRB_ARGS_REQ(2));
     mrb_define_method(mrb, memcached, "close", mrb_memcached_close, MRB_ARGS_NONE());
     mrb_define_method(mrb, memcached, "set", mrb_memcached_set, MRB_ARGS_ANY());
     mrb_define_method(mrb, memcached, "get", mrb_memcached_get, MRB_ARGS_REQ(1));
+    mrb_define_method(mrb, memcached, "set_behavior", mrb_memcached_set_behavior, MRB_ARGS_ANY());
+
+    mrb_define_const(mrb, memcached, "MEMCACHED_BEHAVIOR_NO_BLOCK", mrb_fixnum_value(MEMCACHED_BEHAVIOR_NO_BLOCK));
+    mrb_define_const(mrb, memcached, "MEMCACHED_BEHAVIOR_TCP_NODELAY", mrb_fixnum_value(MEMCACHED_BEHAVIOR_TCP_NODELAY));
+    mrb_define_const(mrb, memcached, "MEMCACHED_BEHAVIOR_HASH", mrb_fixnum_value(MEMCACHED_BEHAVIOR_HASH));
+    mrb_define_const(mrb, memcached, "MEMCACHED_BEHAVIOR_KETAMA", mrb_fixnum_value(MEMCACHED_BEHAVIOR_KETAMA));
+    mrb_define_const(mrb, memcached, "MEMCACHED_BEHAVIOR_SOCKET_SEND_SIZE", mrb_fixnum_value(MEMCACHED_BEHAVIOR_SOCKET_SEND_SIZE));
+    mrb_define_const(mrb, memcached, "MEMCACHED_BEHAVIOR_SOCKET_RECV_SIZE", mrb_fixnum_value(MEMCACHED_BEHAVIOR_SOCKET_RECV_SIZE));
+    mrb_define_const(mrb, memcached, "MEMCACHED_BEHAVIOR_CACHE_LOOKUPS", mrb_fixnum_value(MEMCACHED_BEHAVIOR_CACHE_LOOKUPS));
+    mrb_define_const(mrb, memcached, "MEMCACHED_BEHAVIOR_SUPPORT_CAS", mrb_fixnum_value(MEMCACHED_BEHAVIOR_SUPPORT_CAS));
+    mrb_define_const(mrb, memcached, "MEMCACHED_BEHAVIOR_POLL_TIMEOUT", mrb_fixnum_value(MEMCACHED_BEHAVIOR_POLL_TIMEOUT));
+    mrb_define_const(mrb, memcached, "MEMCACHED_BEHAVIOR_DISTRIBUTION", mrb_fixnum_value(MEMCACHED_BEHAVIOR_DISTRIBUTION));
+    mrb_define_const(mrb, memcached, "MEMCACHED_BEHAVIOR_BUFFER_REQUESTS", mrb_fixnum_value(MEMCACHED_BEHAVIOR_BUFFER_REQUESTS));
+    mrb_define_const(mrb, memcached, "MEMCACHED_BEHAVIOR_USER_DATA", mrb_fixnum_value(MEMCACHED_BEHAVIOR_USER_DATA));
+    mrb_define_const(mrb, memcached, "MEMCACHED_BEHAVIOR_SORT_HOSTS", mrb_fixnum_value(MEMCACHED_BEHAVIOR_SORT_HOSTS));
+    mrb_define_const(mrb, memcached, "MEMCACHED_BEHAVIOR_VERIFY_KEY", mrb_fixnum_value(MEMCACHED_BEHAVIOR_VERIFY_KEY));
+    mrb_define_const(mrb, memcached, "MEMCACHED_BEHAVIOR_CONNECT_TIMEOUT", mrb_fixnum_value(MEMCACHED_BEHAVIOR_CONNECT_TIMEOUT));
+    mrb_define_const(mrb, memcached, "MEMCACHED_BEHAVIOR_RETRY_TIMEOUT", mrb_fixnum_value(MEMCACHED_BEHAVIOR_RETRY_TIMEOUT));
+    mrb_define_const(mrb, memcached, "MEMCACHED_BEHAVIOR_KETAMA_WEIGHTED", mrb_fixnum_value(MEMCACHED_BEHAVIOR_KETAMA_WEIGHTED));
+    mrb_define_const(mrb, memcached, "MEMCACHED_BEHAVIOR_KETAMA_HASH", mrb_fixnum_value(MEMCACHED_BEHAVIOR_KETAMA_HASH));
+    mrb_define_const(mrb, memcached, "MEMCACHED_BEHAVIOR_BINARY_PROTOCOL", mrb_fixnum_value(MEMCACHED_BEHAVIOR_BINARY_PROTOCOL));
+    mrb_define_const(mrb, memcached, "MEMCACHED_BEHAVIOR_SND_TIMEOUT", mrb_fixnum_value(MEMCACHED_BEHAVIOR_SND_TIMEOUT));
+    mrb_define_const(mrb, memcached, "MEMCACHED_BEHAVIOR_RCV_TIMEOUT", mrb_fixnum_value(MEMCACHED_BEHAVIOR_RCV_TIMEOUT));
+    mrb_define_const(mrb, memcached, "MEMCACHED_BEHAVIOR_SERVER_FAILURE_LIMIT", mrb_fixnum_value(MEMCACHED_BEHAVIOR_SERVER_FAILURE_LIMIT));
+    mrb_define_const(mrb, memcached, "MEMCACHED_BEHAVIOR_IO_MSG_WATERMARK", mrb_fixnum_value(MEMCACHED_BEHAVIOR_IO_MSG_WATERMARK));
+    mrb_define_const(mrb, memcached, "MEMCACHED_BEHAVIOR_IO_BYTES_WATERMARK", mrb_fixnum_value(MEMCACHED_BEHAVIOR_IO_BYTES_WATERMARK));
+    mrb_define_const(mrb, memcached, "MEMCACHED_BEHAVIOR_IO_KEY_PREFETCH", mrb_fixnum_value(MEMCACHED_BEHAVIOR_IO_KEY_PREFETCH));
+    mrb_define_const(mrb, memcached, "MEMCACHED_BEHAVIOR_HASH_WITH_PREFIX_KEY", mrb_fixnum_value(MEMCACHED_BEHAVIOR_HASH_WITH_PREFIX_KEY));
+    mrb_define_const(mrb, memcached, "MEMCACHED_BEHAVIOR_NOREPLY", mrb_fixnum_value(MEMCACHED_BEHAVIOR_NOREPLY));
+    mrb_define_const(mrb, memcached, "MEMCACHED_BEHAVIOR_USE_UDP", mrb_fixnum_value(MEMCACHED_BEHAVIOR_USE_UDP));
+    mrb_define_const(mrb, memcached, "MEMCACHED_BEHAVIOR_AUTO_EJECT_HOSTS", mrb_fixnum_value(MEMCACHED_BEHAVIOR_AUTO_EJECT_HOSTS));
+    mrb_define_const(mrb, memcached, "MEMCACHED_BEHAVIOR_NUMBER_OF_REPLICAS", mrb_fixnum_value(MEMCACHED_BEHAVIOR_NUMBER_OF_REPLICAS));
+    mrb_define_const(mrb, memcached, "MEMCACHED_BEHAVIOR_RANDOMIZE_REPLICA_READ", mrb_fixnum_value(MEMCACHED_BEHAVIOR_RANDOMIZE_REPLICA_READ));
+    mrb_define_const(mrb, memcached, "MEMCACHED_BEHAVIOR_CORK", mrb_fixnum_value(MEMCACHED_BEHAVIOR_CORK));
+    mrb_define_const(mrb, memcached, "MEMCACHED_BEHAVIOR_TCP_KEEPALIVE", mrb_fixnum_value(MEMCACHED_BEHAVIOR_TCP_KEEPALIVE));
+    mrb_define_const(mrb, memcached, "MEMCACHED_BEHAVIOR_TCP_KEEPIDLE", mrb_fixnum_value(MEMCACHED_BEHAVIOR_TCP_KEEPIDLE));
+    mrb_define_const(mrb, memcached, "MEMCACHED_BEHAVIOR_LOAD_FROM_FILE", mrb_fixnum_value(MEMCACHED_BEHAVIOR_LOAD_FROM_FILE));
+    mrb_define_const(mrb, memcached, "MEMCACHED_BEHAVIOR_REMOVE_FAILED_SERVERS", mrb_fixnum_value(MEMCACHED_BEHAVIOR_REMOVE_FAILED_SERVERS));
+    mrb_define_const(mrb, memcached, "MEMCACHED_BEHAVIOR_DEAD_TIMEOUT", mrb_fixnum_value(MEMCACHED_BEHAVIOR_DEAD_TIMEOUT));
+    mrb_define_const(mrb, memcached, "MEMCACHED_BEHAVIOR_MAX", mrb_fixnum_value(MEMCACHED_BEHAVIOR_MAX));
     DONE;
 }
 
