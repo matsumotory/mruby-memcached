@@ -16,8 +16,14 @@ end
 > m = Memcached.new "127.0.0.1", 11211
 > m.set "hoge", "1"
  => 0
+> m.set :foo, 10
+ => 0
 > m.get "hoge"
  => "1"
+> m.get :hoge
+ => "1"
+> m.get "foo"
+ => "10"
 > m.close
 ```
 
