@@ -98,7 +98,7 @@ static mrb_value mrb_memcached_close(mrb_state *mrb, mrb_value self)
 static mrb_value mrb_memcached_set(mrb_state *mrb, mrb_value self)
 {
   mrb_value key, val;
-  mrb_int expr = 600;
+  mrb_int expr = 0;
   mrb_memcached_data *data = DATA_PTR(self);
 
   mrb_get_args(mrb, "oo|i", &key, &val, &expr);
