@@ -34,8 +34,7 @@ static mrb_value mrb_memcached_init(mrb_state *mrb, mrb_value self)
   memcached_server_st *msv;
   memcached_st *mst;
   memcached_return mrt;
-  char *host;
-  mrb_int port;
+  const char *servers;
 
   data = (mrb_memcached_data *)DATA_PTR(self);
   if (data) {
@@ -44,14 +43,10 @@ static mrb_value mrb_memcached_init(mrb_state *mrb, mrb_value self)
   DATA_TYPE(self) = &mrb_memcached_data_type;
   DATA_PTR(self) = NULL;
 
-  mrb_get_args(mrb, "zi", &host, &port);
+  mrb_get_args(mrb, "z", &servers);
 
   mst = memcached_create(NULL);  
-  msv = memcached_server_list_append(NULL, host, port, &mrt);
-  if (mrt != MEMCACHED_SUCCESS) {
-    mrb_raisef(mrb, E_RUNTIME_ERROR, "libmemcached error: %S"
-      , mrb_str_new_cstr(mrb, memcached_strerror(mst, mrt)));
-  }
+  msv = memcached_servers_parse(servers);
   mrt = memcached_server_push(mst, msv);
   if (mrt != MEMCACHED_SUCCESS) {
     mrb_raisef(mrb, E_RUNTIME_ERROR, "libmemcached error: %S"

@@ -13,7 +13,7 @@ end
 ```
 ## example 
 ```ruby
-> m = Memcached.new "127.0.0.1", 11211
+> m = Memcached.new "127.0.0.1:11211"
 > m.set "hoge", "1"
  => 0
 # defaule expire time is 600 sec
@@ -32,8 +32,8 @@ end
 ```
 #### Replicas
 ```ruby
-m = Memcached.new "127.0.0.1", 11211
-
+# m = Memcached.new "127.0.0.1:11211,127.0.0.1:11212,127.0.0.1:11213"
+m = Memcached.new "127.0.0.1:11211"
 m.server_add "127.0.0.1", 11212
 m.server_add "127.0.0.1", 11213
 
