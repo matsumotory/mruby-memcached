@@ -107,6 +107,17 @@ static mrb_value mrb_memcached_set(mrb_state *mrb, mrb_value self)
   mrb_memcached_data *data = DATA_PTR(self);
 
   mrb_get_args(mrb, "oo", &key, &val);
+  switch (mrb_type(key)) {
+    case MRB_TT_STRING:
+      break;
+    case MRB_TT_SYMBOL:
+      key = mrb_obj_as_string(mrb, key);
+      break;
+    default:
+      mrb_raise(mrb, E_RUNTIME_ERROR, "memcached key type is string or symbol");
+  }
+  val = mrb_obj_as_string(mrb, val);
+
   data->mrt = memcached_set(data->mst, RSTRING_PTR(key), RSTRING_LEN(key), RSTRING_PTR(val), RSTRING_LEN(val), (time_t)600, (uint32_t)0);
   if (data->mrt != MEMCACHED_SUCCESS && data->mrt != MEMCACHED_BUFFERED) {
     // set failed
@@ -124,6 +135,15 @@ static mrb_value mrb_memcached_get(mrb_state *mrb, mrb_value self)
   mrb_memcached_data *data = DATA_PTR(self);
 
   mrb_get_args(mrb, "o", &key);
+  switch (mrb_type(key)) {
+    case MRB_TT_STRING:
+      break;
+    case MRB_TT_SYMBOL:
+      key = mrb_obj_as_string(mrb, key);
+      break;
+    default:
+      mrb_raise(mrb, E_RUNTIME_ERROR, "memcached key type is string or symbol");
+  }
   val = memcached_get(data->mst, RSTRING_PTR(key), RSTRING_LEN(key), &len, &flags, &(data->mrt));
   if (data->mrt != MEMCACHED_SUCCESS && data->mrt != MEMCACHED_BUFFERED) {
     free(val);
