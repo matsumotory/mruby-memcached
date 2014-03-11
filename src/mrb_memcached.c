@@ -208,10 +208,10 @@ void mrb_mruby_memcached_gem_init(mrb_state *mrb)
     mrb_define_const(mrb, memcached, "MEMCACHED_BEHAVIOR_CORK", mrb_fixnum_value(MEMCACHED_BEHAVIOR_CORK));
     mrb_define_const(mrb, memcached, "MEMCACHED_BEHAVIOR_TCP_KEEPALIVE", mrb_fixnum_value(MEMCACHED_BEHAVIOR_TCP_KEEPALIVE));
     mrb_define_const(mrb, memcached, "MEMCACHED_BEHAVIOR_TCP_KEEPIDLE", mrb_fixnum_value(MEMCACHED_BEHAVIOR_TCP_KEEPIDLE));
-    mrb_define_const(mrb, memcached, "MEMCACHED_BEHAVIOR_LOAD_FROM_FILE", mrb_fixnum_value(MEMCACHED_BEHAVIOR_LOAD_FROM_FILE));
-    mrb_define_const(mrb, memcached, "MEMCACHED_BEHAVIOR_REMOVE_FAILED_SERVERS", mrb_fixnum_value(MEMCACHED_BEHAVIOR_REMOVE_FAILED_SERVERS));
-    mrb_define_const(mrb, memcached, "MEMCACHED_BEHAVIOR_DEAD_TIMEOUT", mrb_fixnum_value(MEMCACHED_BEHAVIOR_DEAD_TIMEOUT));
-    mrb_define_const(mrb, memcached, "MEMCACHED_BEHAVIOR_MAX", mrb_fixnum_value(MEMCACHED_BEHAVIOR_MAX));
+    //mrb_define_const(mrb, memcached, "MEMCACHED_BEHAVIOR_LOAD_FROM_FILE", mrb_fixnum_value(MEMCACHED_BEHAVIOR_LOAD_FROM_FILE));
+    //mrb_define_const(mrb, memcached, "MEMCACHED_BEHAVIOR_REMOVE_FAILED_SERVERS", mrb_fixnum_value(MEMCACHED_BEHAVIOR_REMOVE_FAILED_SERVERS));
+    //mrb_define_const(mrb, memcached, "MEMCACHED_BEHAVIOR_DEAD_TIMEOUT", mrb_fixnum_value(MEMCACHED_BEHAVIOR_DEAD_TIMEOUT));
+    //mrb_define_const(mrb, memcached, "MEMCACHED_BEHAVIOR_MAX", mrb_fixnum_value(MEMCACHED_BEHAVIOR_MAX));
     DONE;
 }
 
