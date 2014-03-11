@@ -70,7 +70,7 @@ static mrb_value mrb_memcached_init(mrb_state *mrb, mrb_value self)
   return self;
 }
 
-static mrb_value mrb_memcached_add_server(mrb_state *mrb, mrb_value self)
+static mrb_value mrb_memcached_server_add(mrb_state *mrb, mrb_value self)
 {
   mrb_memcached_data *data = DATA_PTR(self);
   char *host;
@@ -148,7 +148,7 @@ static mrb_value mrb_memcached_get(mrb_state *mrb, mrb_value self)
   return mrb_str_new(mrb, val, len);
 }
 
-static mrb_value mrb_memcached_set_behavior(mrb_state *mrb, mrb_value self)
+static mrb_value mrb_memcached_behavior_set(mrb_state *mrb, mrb_value self)
 {
   mrb_memcached_data *data = DATA_PTR(self);
   uint64_t fdata = 1;
@@ -168,11 +168,11 @@ void mrb_mruby_memcached_gem_init(mrb_state *mrb)
     memcached = mrb_define_class(mrb, "Memcached", mrb->object_class);
 
     mrb_define_method(mrb, memcached, "initialize", mrb_memcached_init, MRB_ARGS_REQ(1));
-    mrb_define_method(mrb, memcached, "add_server", mrb_memcached_add_server, MRB_ARGS_REQ(2));
+    mrb_define_method(mrb, memcached, "server_add", mrb_memcached_server_add, MRB_ARGS_REQ(2));
     mrb_define_method(mrb, memcached, "close", mrb_memcached_close, MRB_ARGS_NONE());
     mrb_define_method(mrb, memcached, "set", mrb_memcached_set, MRB_ARGS_ANY());
     mrb_define_method(mrb, memcached, "get", mrb_memcached_get, MRB_ARGS_REQ(1));
-    mrb_define_method(mrb, memcached, "set_behavior", mrb_memcached_set_behavior, MRB_ARGS_ANY());
+    mrb_define_method(mrb, memcached, "behavior_set", mrb_memcached_behavior_set, MRB_ARGS_ANY());
 
     mrb_define_const(mrb, memcached, "MEMCACHED_BEHAVIOR_NO_BLOCK", mrb_fixnum_value(MEMCACHED_BEHAVIOR_NO_BLOCK));
     mrb_define_const(mrb, memcached, "MEMCACHED_BEHAVIOR_TCP_NODELAY", mrb_fixnum_value(MEMCACHED_BEHAVIOR_TCP_NODELAY));
