@@ -104,9 +104,10 @@ static mrb_value mrb_memcached_close(mrb_state *mrb, mrb_value self)
 static mrb_value mrb_memcached_set(mrb_state *mrb, mrb_value self)
 {
   mrb_value key, val;
+  mrb_int expr = 600;
   mrb_memcached_data *data = DATA_PTR(self);
 
-  mrb_get_args(mrb, "oo", &key, &val);
+  mrb_get_args(mrb, "oo|i", &key, &val, &expr);
   switch (mrb_type(key)) {
     case MRB_TT_STRING:
       break;
@@ -118,7 +119,7 @@ static mrb_value mrb_memcached_set(mrb_state *mrb, mrb_value self)
   }
   val = mrb_obj_as_string(mrb, val);
 
-  data->mrt = memcached_set(data->mst, RSTRING_PTR(key), RSTRING_LEN(key), RSTRING_PTR(val), RSTRING_LEN(val), (time_t)600, (uint32_t)0);
+  data->mrt = memcached_set(data->mst, RSTRING_PTR(key), RSTRING_LEN(key), RSTRING_PTR(val), RSTRING_LEN(val), (time_t)expr, (uint32_t)0);
   if (data->mrt != MEMCACHED_SUCCESS && data->mrt != MEMCACHED_BUFFERED) {
     // set failed
     return mrb_nil_value();
@@ -166,7 +167,7 @@ void mrb_mruby_memcached_gem_init(mrb_state *mrb)
     mrb_define_method(mrb, memcached, "initialize", mrb_memcached_init, MRB_ARGS_REQ(1));
     mrb_define_method(mrb, memcached, "add_server", mrb_memcached_server_list_append, MRB_ARGS_REQ(2));
     mrb_define_method(mrb, memcached, "close", mrb_memcached_close, MRB_ARGS_NONE());
-    mrb_define_method(mrb, memcached, "set", mrb_memcached_set, MRB_ARGS_REQ(2));
+    mrb_define_method(mrb, memcached, "set", mrb_memcached_set, MRB_ARGS_ANY());
     mrb_define_method(mrb, memcached, "get", mrb_memcached_get, MRB_ARGS_REQ(1));
     mrb_define_method(mrb, memcached, "count_servers", mrb_memcached_count_servers, MRB_ARGS_NONE());
     DONE;
