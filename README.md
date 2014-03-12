@@ -16,8 +16,8 @@ end
 > m = Memcached.new "127.0.0.1:11211"
 > m.set "hoge", "1"
  => 0
-# defaule expire time is 600 sec
-# m.set :foo, 10, 600
+# defaule expire time is 0 sec(inifinity)
+# m.set :foo, 10, 0
 # if you want expire time 1000 sec,
 # m.set :foo, 10, 1000
 > m.set :foo, 10
