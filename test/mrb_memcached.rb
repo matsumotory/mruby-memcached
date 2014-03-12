@@ -25,3 +25,12 @@ assert("Memcached#set,get with symbol and string") do
   m.close
   assert_equal("100", real)
 end
+
+assert("Memcached#delete") do
+  m = Memcached.new "127.0.0.1:11211"
+  m.set "foo", 100
+  m.delete :foo
+  real = m.get :foo
+  m.close
+  assert_equal(nil, real)
+end

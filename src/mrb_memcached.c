@@ -141,6 +141,30 @@ static mrb_value mrb_memcached_get(mrb_state *mrb, mrb_value self)
   return mrb_str_new(mrb, val, len);
 }
 
+static mrb_value mrb_memcached_delete(mrb_state *mrb, mrb_value self)
+{
+  mrb_value key;
+  memcached_return mrt;
+  mrb_int expr = 0;
+  mrb_memcached_data *data = DATA_PTR(self);
+
+  mrb_get_args(mrb, "o|i", &key, &expr);
+  switch (mrb_type(key)) {
+    case MRB_TT_STRING:
+      break;
+    case MRB_TT_SYMBOL:
+      key = mrb_obj_as_string(mrb, key);
+      break;
+    default:
+      mrb_raise(mrb, E_RUNTIME_ERROR, "memcached key type is string or symbol");
+  }
+  mrt = memcached_delete(data->mst, RSTRING_PTR(key), RSTRING_LEN(key), (time_t)expr);
+  if (mrt != MEMCACHED_SUCCESS && mrt != MEMCACHED_BUFFERED) {
+    return mrb_nil_value();
+  }
+  return mrb_fixnum_value(mrt);
+}
+
 static mrb_value mrb_memcached_behavior_set(mrb_state *mrb, mrb_value self)
 {
   mrb_memcached_data *data = DATA_PTR(self);
@@ -166,6 +190,7 @@ void mrb_mruby_memcached_gem_init(mrb_state *mrb)
     mrb_define_method(mrb, memcached, "close", mrb_memcached_close, MRB_ARGS_NONE());
     mrb_define_method(mrb, memcached, "set", mrb_memcached_set, MRB_ARGS_ANY());
     mrb_define_method(mrb, memcached, "get", mrb_memcached_get, MRB_ARGS_REQ(1));
+    mrb_define_method(mrb, memcached, "delete", mrb_memcached_delete, MRB_ARGS_ANY());
     mrb_define_method(mrb, memcached, "behavior_set", mrb_memcached_behavior_set, MRB_ARGS_ANY());
 
     mrb_define_const(mrb, memcached, "MEMCACHED_BEHAVIOR_NO_BLOCK", mrb_fixnum_value(MEMCACHED_BEHAVIOR_NO_BLOCK));
