@@ -34,3 +34,17 @@ assert("Memcached#delete") do
   m.close
   assert_equal(nil, real)
 end
+
+assert("Memcached#add") do
+  m = Memcached.new "127.0.0.1:11211"
+  m.set "foo", 100
+  real1 = m.add :foo, 101
+  real2 = m.add :foo1, 10
+  real3 = m.get :foo1
+  real4 = m.get :foo
+  m.close
+  assert_equal(Memcached::MEMCACHED_NOTSTORED, real1)
+  assert_equal(Memcached::MEMCACHED_SUCCESS, real2)
+  assert_equal("10", real3)
+  assert_equal("100", real4)
+end
