@@ -42,6 +42,9 @@ m.behavior_set Memcached::MEMCACHED_BEHAVIOR_NUMBER_OF_REPLICAS, 2
 
 m.set :hoge, "foo"
 p m.get :hoge # => foo
+m.flush_buffers
+
+# exec the following memcat commands after flush_buffers
 
 m.close
 ```
