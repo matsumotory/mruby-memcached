@@ -12,6 +12,7 @@ MRuby::Build.new do |conf|
 end
 ```
 ## example 
+#### Get/Set
 ```ruby
 > m = Memcached.new "127.0.0.1:11211"
 > m.set "hoge", "1"
