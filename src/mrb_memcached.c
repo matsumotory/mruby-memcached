@@ -221,6 +221,18 @@ static mrb_value mrb_memcached_flush(mrb_state *mrb, mrb_value self)
   return mrb_fixnum_value(mrt);
 }
 
+static mrb_value mrb_memcached_flush_buffers(mrb_state *mrb, mrb_value self)
+{
+  memcached_return mrt;
+  mrb_memcached_data *data = DATA_PTR(self);
+
+  mrt = memcached_flush_buffers(data->mst);
+  if (mrt != MEMCACHED_SUCCESS) {
+    return mrb_nil_value();
+  }
+  return mrb_fixnum_value(mrt);
+}
+
 #define MRB_MEMCACHED_DEFINE_CONST_FIXNUM(val)  mrb_define_const(mrb, memcached, #val, mrb_fixnum_value(val))
 
 void mrb_mruby_memcached_gem_init(mrb_state *mrb)
@@ -237,6 +249,7 @@ void mrb_mruby_memcached_gem_init(mrb_state *mrb)
   mrb_define_method(mrb, memcached, "delete", mrb_memcached_delete, MRB_ARGS_ANY());
   mrb_define_method(mrb, memcached, "behavior_set", mrb_memcached_behavior_set, MRB_ARGS_ANY());
   mrb_define_method(mrb, memcached, "flush", mrb_memcached_flush, MRB_ARGS_OPT(1));
+  mrb_define_method(mrb, memcached, "flush_buffers", mrb_memcached_flush_buffers, MRB_ARGS_NONE());
 
   // behavior type, enum
   MRB_MEMCACHED_DEFINE_CONST_FIXNUM(MEMCACHED_BEHAVIOR_NO_BLOCK);
