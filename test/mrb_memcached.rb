@@ -11,6 +11,15 @@ assert("Memcached#set,get with string") do
   assert_equal("1", real)
 end
 
+assert("Memcached#[],[]= with string") do
+  m = Memcached.new "127.0.0.1:11211"
+  m.flush
+  m["test"] = 1
+  real = m["test"]
+  m.close
+  assert_equal("1", real)
+end
+
 assert("Memcached#set,get with symbol") do
   m = Memcached.new "127.0.0.1:11211"
   m.flush

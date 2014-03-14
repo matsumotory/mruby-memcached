@@ -244,8 +244,10 @@ void mrb_mruby_memcached_gem_init(mrb_state *mrb)
   mrb_define_method(mrb, memcached, "server_add", mrb_memcached_server_add, MRB_ARGS_REQ(2));
   mrb_define_method(mrb, memcached, "close", mrb_memcached_close, MRB_ARGS_NONE());
   mrb_define_method(mrb, memcached, "set", mrb_memcached_set, MRB_ARGS_ANY());
+  mrb_define_method(mrb, memcached, "[]=", mrb_memcached_set, MRB_ARGS_ANY());
   mrb_define_method(mrb, memcached, "add", mrb_memcached_add, MRB_ARGS_ANY());
   mrb_define_method(mrb, memcached, "get", mrb_memcached_get, MRB_ARGS_REQ(1));
+  mrb_define_method(mrb, memcached, "[]", mrb_memcached_get, MRB_ARGS_REQ(1));
   mrb_define_method(mrb, memcached, "delete", mrb_memcached_delete, MRB_ARGS_ANY());
   mrb_define_method(mrb, memcached, "behavior_set", mrb_memcached_behavior_set, MRB_ARGS_ANY());
   mrb_define_method(mrb, memcached, "flush", mrb_memcached_flush, MRB_ARGS_OPT(1));
