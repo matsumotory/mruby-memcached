@@ -7,6 +7,7 @@
 */
 
 #include "mruby.h"
+#include "mruby/class.h"
 #include "mruby/data.h"
 #include "mruby/string.h"
 #include "mrb_memcached.h"
@@ -21,7 +22,9 @@ typedef struct {
 static void mrb_memcached_data_free(mrb_state *mrb, void *p)
 {   
   mrb_memcached_data *data = (mrb_memcached_data *)p;
+  if (!p) { return; }
   memcached_free(data->mst);
+  mrb_free(mrb, p);
 }
 
 static const struct mrb_data_type mrb_memcached_data_type = {
@@ -83,6 +86,8 @@ static mrb_value mrb_memcached_close(mrb_state *mrb, mrb_value self)
 {
   mrb_memcached_data *data = DATA_PTR(self);
   memcached_free(data->mst);
+  mrb_free(mrb, data);
+  DATA_PTR(self) = NULL;
   return self;
 }
 
@@ -142,7 +147,7 @@ static mrb_value mrb_memcached_add(mrb_state *mrb, mrb_value self)
 
 static mrb_value mrb_memcached_get(mrb_state *mrb, mrb_value self)
 {
-  mrb_value key;
+  mrb_value key, ret;
   char *val;
   size_t len;
   uint32_t flags;
@@ -165,7 +170,9 @@ static mrb_value mrb_memcached_get(mrb_state *mrb, mrb_value self)
     // value not found
     return mrb_nil_value();
   }
-  return mrb_str_new(mrb, val, len);
+  ret = mrb_str_new(mrb, val, len);
+  free(val);
+  return ret;
 }
 
 static mrb_value mrb_memcached_delete(mrb_state *mrb, mrb_value self)
@@ -239,6 +246,7 @@ void mrb_mruby_memcached_gem_init(mrb_state *mrb)
 {
   struct RClass *memcached;
   memcached = mrb_define_class(mrb, "Memcached", mrb->object_class);
+  MRB_SET_INSTANCE_TT(memcached, MRB_TT_DATA);
 
   mrb_define_method(mrb, memcached, "initialize", mrb_memcached_init, MRB_ARGS_REQ(1));
   mrb_define_method(mrb, memcached, "server_add", mrb_memcached_server_add, MRB_ARGS_REQ(2));
